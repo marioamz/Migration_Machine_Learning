@@ -10,7 +10,7 @@ def read(fname, countries, year):
 
     Input:
         - fname: filename of .dta file
-        - countries: tuple of countries I want to keep
+        - countries: tuple of countries I want to keep (stored as digits)
         - year: year I want to start collect data
     Output:
         - dataframe for country/year pairs
@@ -91,6 +91,4 @@ def impute_na(df):
         - impute_df: dataframe where nulls = 0
     '''
 
-    return df.fillna(0, in_place=True)
-
-    
+    return df.fillna(0)
