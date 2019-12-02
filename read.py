@@ -92,3 +92,42 @@ def impute_na(df):
     '''
 
     return df.fillna(0)
+
+def check_otherna(df):
+    '''
+    Given the nature of the survey data, some no responses could be
+    coded as really high values. This function checks for that.
+
+    Input:
+        - df: dataframe
+    Output:
+        - prints columns with other values that could be no responses
+        which can then be checked with codebook
+    '''
+
+    print('Columns with possible other no respones values')
+    for i in df:
+        if (df[i] > 50):
+            print(i)
+
+def drop_na_outcome(df, dvar):
+    '''
+    Drop my no responses in the outcome variable, as they don't help
+
+    Input:
+        - df: dataframe
+        - dvar: dependent variable
+    Output:
+        - fdf: dataframe with na values dropped in dependent variable
+    '''
+
+    s = df[str(dvar)].value_counts()
+
+    print('# of no respones in dependent variable')
+    for i, v in s.items():
+        if i < 1:
+            print(v)
+        else:
+            print('none')
+
+    return df[df.dvar != 0]
