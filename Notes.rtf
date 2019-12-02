@@ -11,8 +11,18 @@ Goal: Use machine learning to determine which features best predict or correlate
 \
 Data: LAPOP survey data from 2012-2019 from three countries: Honduras, Guatemala, El Salvador, these countries are coded as 4, 3, 2 in LAPOP. \
 \
+read.py\
+\
+Uses pandas to read in data. It then selects the countries and years I care about, followed by removing any questions that had more than 5% nulls (as an argument for MAR). Lastly, it imputes missing values with zero, which is the non-response answer. \
+\
+Still needed: remove variables that have no real value, change all no response codes to zero, apply weights\
+\
+explore.py\
+\
+\
+\
+\
 Next steps: \
-	- Change no response codes to zeroes (impute_na)\
 	- Do null analysis per year, understand what that means\
 	- Apply weights\
 	- Begin data exploration, which includes correlation heat map\
