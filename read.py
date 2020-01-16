@@ -3,15 +3,57 @@
 
 import pandas as pd
 
-def read(fname, countries, year):
+
+def go(fname, countries, year, col, dvar):
+    '''
+    Go function for the program, spits out cleaned df
+    '''
+
+    dept_dict = read_dta(fname, col)
+    findf = read(fname, countries, year, dept_dict)
+    #Change the names of the countries
+    findf['pais'] = findf['pais'].replace({2:'Guatemala', 3:'El Salvador', 4:'Honduras'})
+
+    findf.to_csv('Data/clean.csv', index=False)
+
+    return findf
+
+
+def read_dta(fname, col):
+    '''
+    Finds metadata for each column, which includes department names
+    and more for each column, this is important to determine what
+    we're looking at.
+
+    Input:
+        - fname: filename of the .dta file
+        - column: column that we want to find information for, if __name__ == '__main__':
+                    this case it's provinces
+    Output:
+        - dict: a dictionary that lets me later change codes to department names
+                in the dataframe
+    '''
+
+    test = pd.read_stata('Data/All_LAPOP.dta', iterator = True)
+
+    for i, x in test.value_labels().items():
+        if i == 'prov_esp':
+            prov_dict = x
+
+    return prov_dict
+
+
+def read(fname, countries, year, dict):
     '''
     Turn a .dta file into a pandas dataframe, and keep
-    countries and years that we care about
+    countries and years that we care about. It runs a
+    whole bunch of helper functions to clean it up.
 
     Input:
         - fname: filename of .dta file
         - countries: tuple of countries I want to keep (stored as digits)
         - year: year I want to start collect data
+        - dict: dictionary with department names
     Output:
         - dataframe for country/year pairs
     '''
@@ -23,7 +65,16 @@ def read(fname, countries, year):
     # Selecting years
     predf = cdf[cdf['year'] >= year]
 
-    return predf
+    predf['prov'] = predf['prov'].replace(dict)
+    # Helper functions
+    qdf = questions(predf)
+    mdf = missing_random(qdf, perc=0.05)
+    idf = impute_na(mdf)
+    nadf = check_otherna(idf)
+    pdf = drop_na_outcome(nadf)
+
+    return pdf
+
 
 def questions(dframe):
     '''
@@ -53,6 +104,7 @@ def questions(dframe):
 
     return df_years
 
+
 def missing_random(df, perc = 0.05):
     '''
     From a dataframe, remove columns with high percentages of
@@ -80,6 +132,7 @@ def missing_random(df, perc = 0.05):
 
     return null_df
 
+
 def impute_na(df):
     '''
     Imputes missing variables, since they're random in this survey,
@@ -92,6 +145,7 @@ def impute_na(df):
     '''
 
     return df.fillna(0)
+
 
 def check_otherna(df):
     '''
@@ -109,6 +163,7 @@ def check_otherna(df):
     for i in df:
         if (df[i] > 50):
             print(i)
+
 
 def drop_na_outcome(df, dvar):
     '''
