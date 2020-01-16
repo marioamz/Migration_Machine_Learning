@@ -10,7 +10,7 @@ def go(fname, countries, year, col, dvar):
     '''
 
     dept_dict = read_dta(fname, col)
-    findf = read(fname, countries, year, dept_dict)
+    findf = read(fname, countries, year, dept_dict, dvar)
     #Change the names of the countries
     findf['pais'] = findf['pais'].replace({2:'Guatemala', 3:'El Salvador', 4:'Honduras'})
 
@@ -27,8 +27,8 @@ def read_dta(fname, col):
 
     Input:
         - fname: filename of the .dta file
-        - column: column that we want to find information for, if __name__ == '__main__':
-                    this case it's provinces
+        - column: column that we want to find information for,
+                    this case it's provinces ('prov_esp')
     Output:
         - dict: a dictionary that lets me later change codes to department names
                 in the dataframe
@@ -37,13 +37,13 @@ def read_dta(fname, col):
     test = pd.read_stata('Data/All_LAPOP.dta', iterator = True)
 
     for i, x in test.value_labels().items():
-        if i == 'prov_esp':
+        if i == col:
             prov_dict = x
 
     return prov_dict
 
 
-def read(fname, countries, year, dict):
+def read(fname, countries, year, dict, dvar):
     '''
     Turn a .dta file into a pandas dataframe, and keep
     countries and years that we care about. It runs a
@@ -71,7 +71,7 @@ def read(fname, countries, year, dict):
     mdf = missing_random(qdf, perc=0.05)
     idf = impute_na(mdf)
     nadf = check_otherna(idf)
-    pdf = drop_na_outcome(nadf)
+    pdf = drop_na_outcome(nadf, dvar)
 
     return pdf
 
@@ -159,10 +159,9 @@ def check_otherna(df):
         which can then be checked with codebook
     '''
 
-    print('Columns with possible other no respones values')
-    for i in df:
-        if (df[i] > 50):
-            print(i)
+    dropped_df = df.loc[(df > 50).any(1)]
+
+    return dropped_df
 
 
 def drop_na_outcome(df, dvar):
@@ -185,4 +184,4 @@ def drop_na_outcome(df, dvar):
         else:
             print('none')
 
-    return df[df.dvar != 0]
+    return df[df[str(dvar)] != 0]
