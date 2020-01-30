@@ -1,0 +1,53 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1671\cocoasubrtf600
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11140\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 LAPOP Migration Project\
+\
+Goal: Use machine learning to determine which features best predict or correlate with a survey respondent indicating they want to migrate within the next three years\
+\
+Data: LAPOP survey data from 2012-2019 from three countries: Honduras, Guatemala, El Salvador, these countries are coded as 4, 3, 2 in LAPOP. \
+\
+read.py\
+\
+Uses pandas to read in data. It then selects the countries and years I care about, followed by removing any questions that had more than 5% nulls (as an argument for MAR). Lastly, it imputes missing values with zero, which is the non-response answer. \
+\
+explore.py\
+\
+Questions: \
+	What is distribution of intent to migrate in all three countries across years?\
+	\
+\
+Next steps: \
+	- Begin data exploration, which includes correlation heat map\
+\
+Assumptions so far:\
+	- Only keeping in variables (questions) answered in all three countries for all years\
+	- Determined that MAR means that any given question was answered more than 95% of the time\
+	- Nulls in this scenario are equal to zero, which is no response\
+	- We don\'92t need to apply weights, since they\'92re useful only in the aggregate\
+\
+Things I know:\
+	- q14 is the dependent variable, which is 1 for yes and 2 for no. It\'92s binary. \
+	- Need to change no response codes that aren\'92t zero to actual zeroes,\
+		- Do they change my 5% analysis?\
+\
+Questions to be determined\
+	- What do I do with my nulls in dependent variable?\
+	- Do I need to do MAR analysis per year? Currently doing for all years together\
+	- What\'92s valuable data exploration here (per country, per year)?\
+	- How do I do train-test splits given the different years and countries?\
+	- Is this a time series analysis that will require LASSO or LSTM or others?\
+	- How do I do a robustness check?\
+		- Camila does OLS?\
+		- Do other countries (Mexico, Nicaragua, Venezuela)?\
+		- Do country/year pairs to expand independent variables?\
+\
+Big ideas\
+	- Use selenium and beautiful soup to set up an automatic way to download any .dta file from LAPOP\
+		- This avoids storing large .dta files in computer for long time,\
+\
+}
