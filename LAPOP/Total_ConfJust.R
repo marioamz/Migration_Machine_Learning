@@ -36,6 +36,10 @@ plot <- ggplot(institutions, aes(factor(wave), perc_mig, fill = pais)) +
   labs(title = "Respondents in all three countries reported high levels of little to no confidence \n in the efficacy of justice institutions",
        subtitle = "Salvadorians lack more confidence in justice institutions than Guatemalans or Hondurans",
        caption = "Source: Question AOJ12 in LAPOP surveys, asking if survey respondent trusts the judicial system to punish someone who robbed or assaulted them") +
-  xlab('year') + ylab('Percent repoting little to no confidence in justice') 
+  xlab('year') + ylab('Percent repoting little to no confidence in justice institutions') 
 
-plot + wola_theme + theme(legend.position = 'none')
+final <- plot + wola_theme + theme(legend.position = "none")
+
+ggsave("Graphs/Total_ConfJust.jpeg", width = 8, height = 6)
+
+
