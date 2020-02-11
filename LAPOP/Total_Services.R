@@ -38,4 +38,4 @@ animation <- plot + wola_theme + theme(legend.position = "none")
 
 anim <- animate(animation)
 
-anim_save('Graphs/Total_Bribe.gif', anim)
+anim_save('Graphs/Total_Services.gif', anim)
