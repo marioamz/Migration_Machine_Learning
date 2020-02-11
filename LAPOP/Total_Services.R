@@ -20,7 +20,7 @@ wola_theme <- theme(text = element_text(family='Arial'),
                     plot.subtitle = element_text(size = 16, color = wola_text, face = 'italic', margin = margin(b = 25)), 
                     axis.title.x = element_text(color=wola_text, size=10, margin = margin(t=20), face = "italic"),
                     axis.text.x = element_text(angle = 0, hjust=1),
-                    axis.title.y = element_blank(), 
+                    axis.title.y = element_text(color=wola_text, size=10, margin = margin(r=20), face = "italic"),
                     axis.ticks = element_blank(),
                     plot.caption = element_text(size = 8, margin = margin(t = 15), color = wola_text, face = 'italic'),
                     legend.title = element_text(face='bold', size=8),
@@ -30,8 +30,12 @@ plot <- ggplot(services, aes(x=wave, y=perc_mig, group = pais, label = pais)) +
   geom_line(aes(color = pais), size = 1) + scale_color_manual(values = c(wola_grey, wola_purple, wola_grey)) + 
   geom_text() + transition_reveal(wave) +
   labs(title = 'Guatemalans increasingly think local government\n services are poor',
-       subtitle = 'Honduras and El Salvador are similarly frustrated with local\n services, but not as drastically',
+       subtitle = 'Hondurans and Salvadorians are similarly frustrated with local\n services, but not as drastically',
        caption = "Source: SGL1 in LAPOP surveys, \n asking people's assessment of municipal services") + 
   xlab('Year') + ylab('Percent responding "Bad" or "Very Bad"') 
 
-plot + wola_theme + theme(legend.position = "none")
+animation <- plot + wola_theme + theme(legend.position = "none")
+
+anim <- animate(animation)
+
+anim_save('Graphs/Total_Bribe.gif', anim)
