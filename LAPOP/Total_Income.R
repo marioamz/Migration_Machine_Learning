@@ -33,9 +33,14 @@ plot <- ggplot(income, aes(pais, perc_mig, fill = pais)) +
   scale_fill_manual(values = c(wola_blue, wola_purple, wola_green)) +
   transition_time(wave) + 
   coord_flip() + 
-  labs(title = "Rising numbers of Hondurans, Guatemalans \n are reporting their income is not enough",
+  labs(title = "Rising numbers of Hondurans, Guatemalans \n are reporting their income is insufficient \n and they face economic challenges",
        subtitle = "Year: {frame_time}",
        caption = "Source: Question Q10D in LAPOP surveys, asking if the total salary and income received in respondents' household is enough") +
-  xlab('year') + ylab('percent reporting that income is not enough') 
+  xlab('year') + ylab('percent reporting that income is not enough and they face economic challenges') 
 
-plot + wola_theme + theme(legend.position = 'none')
+animation <- plot + wola_theme + theme(legend.position = "none")
+
+anim <- animate(animation)
+
+anim_save('Graphs/Total_Income.gif', anim)
+
