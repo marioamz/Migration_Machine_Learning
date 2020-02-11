@@ -35,4 +35,8 @@ plot <- ggplot(victim, aes(factor(wave), perc_mig, fill = pais)) +
        caption = "Source: Question vic1ext in LAPOP surveys, asking if survey respondent have been the victims of crime in the last 12 months") +
   xlab('year') + ylab('Percent reporting victimization of a crime') 
 
-plot + wola_theme + theme(legend.position = 'none')
+animation <- plot + wola_theme + theme(legend.position = "none")
+
+anim <- animate(animation)
+
+anim_save('Graphs/Total_Victimization.gif', anim)
