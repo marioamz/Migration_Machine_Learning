@@ -36,4 +36,8 @@ plot <- ggplot(bribe, aes(x=wave, y=perc_mig, group = pais, label = pais)) +
        caption = "Source: EXC2 and EXC6 in LAPOP surveys, \n asking if police or public officials have asked the survey taker for a bribe in the last 12 months") + 
        xlab('Year') + ylab('Percent responding "Yes"') 
 
-plot + wola_theme + theme(legend.position = "none")
+animation <- plot + wola_theme + theme(legend.position = "none")
+
+anim <- animate(animation)
+
+anim_save('Graphs/Total_Bribe.gif', anim)
