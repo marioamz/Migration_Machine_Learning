@@ -62,7 +62,7 @@ plot <- ggplot(cbpfinal, aes(x=year, y=total, group=1)) +
   geom_hline(yintercept = 1000000, linetype = 'dashed', color = wola_grey, show.legend = TRUE) +
   annotate('text', x = 2014, y = 1020000, label = 'italic("1 million apprehensions")', size = 4, color = wola_grey, parse=TRUE)
 
-labels <- labs(title = 'Apprehensions at the Southwest border are at their highest \n since 2007',
+labels <- labs(title = 'Apprehensions at the Southwest border are at their highest \nsince 2007',
                subtitle = 'Prior to 2007, apprehensions were routinely much higher',
                caption = 'Source: CBP Apprehension Data (1980-2019)')
 
