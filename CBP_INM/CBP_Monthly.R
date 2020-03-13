@@ -86,15 +86,15 @@ touse <- fin %>%
   summarise(max = max(total)) %>%
   left_join(fin, by = c('year')) %>%
   mutate(diff = max - total) %>%
-  select(month, year, diff)
+  select(month, year, diff, total)
   
 touse <- transform(touse, sqrt = sqrt(diff))
 sqfin <- transform(fin, sqrt = sqrt(total))
 
 # Now we can finally plot the heatmap
 
-plot <- ggplot(touse, aes(month, reorder(year, desc(year)), fill=sqrt)) +
-  geom_tile(aes(fill = sqrt)) + 
+plot <- ggplot(touse, aes(month, reorder(year, desc(year)), fill=total)) +
+  geom_tile(aes(fill = total)) + 
   scale_color_manual(values = c('#22E9F5', wola_blue, '#0072D5', '#003ABA', '#000C9D', '#040080')) +
   #scale_color_manual(values = c('#040080', '#000C9D', '#003ABA', '#0072D5', wola_blue, '#22E9F5')) +
   scale_x_discrete(position = "top") +
