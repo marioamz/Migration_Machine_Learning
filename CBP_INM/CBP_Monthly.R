@@ -23,10 +23,12 @@ wola_theme <- theme(text = element_text(family='Arial'),
                     plot.subtitle = element_text(size = 16, color = wola_text, face = 'italic', margin = margin(b = 25)), 
                     axis.title.x = element_blank(),
                     axis.line.x = element_line(colour = wola_text),
+                    axis.line.y = element_line(colour = wola_text),
                     axis.text.x = element_text(size = 8, color = wola_text),
-                    axis.text.y = element_blank(),
+                    axis.text.y = element_text(size = 8, color = wola_text),
                     axis.title.y = element_blank(),
                     axis.ticks.y = element_blank(),
+                    axis.ticks.x = element_blank(),
                     plot.caption = element_text(size = 8, margin = margin(t = 15), color = wola_text, face = 'italic'),
                     legend.title = element_text(face='bold', size=8),
                     legend.key.size = unit(0.75, 'cm'))
@@ -67,7 +69,40 @@ fin <- final %>%
 
 fin <- fin[0:240,]
 
-# Get rid of commas, which throw off the values
+# Get rid of commas, which throw off the values, and add rest of 2019 data
 fin$total <- as.numeric(gsub(",","",fin$total))
 
-# Now we can finally plot
+fin <- rbind(fin, `241` = c('October', 2019, 35406))
+fin <- rbind(fin, `242` = c('November', 2019, 33517))
+fin <- rbind(fin, `243` = c('December', 2019, 32854))
+
+fin$total <- as.numeric(fin$total)
+fin$month <- factor(fin$month, levels=c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"))
+fin <- subset(fin, year!= 1999)
+
+# I want to show trends over months in the same year 
+touse <- fin %>%
+  group_by(year) %>%
+  summarise(max = max(total)) %>%
+  left_join(fin, by = c('year')) %>%
+  mutate(diff = max - total) %>%
+  select(month, year, diff)
+  
+touse <- transform(touse, sqrt = sqrt(diff))
+sqfin <- transform(fin, sqrt = sqrt(total))
+
+# Now we can finally plot the heatmap
+
+plot <- ggplot(touse, aes(month, reorder(year, desc(year)), fill=sqrt)) +
+  geom_tile(aes(fill = sqrt)) + 
+  scale_color_manual(values = c('#22E9F5', wola_blue, '#0072D5', '#003ABA', '#000C9D', '#040080')) +
+  #scale_color_manual(values = c('#040080', '#000C9D', '#003ABA', '#0072D5', wola_blue, '#22E9F5')) +
+  scale_x_discrete(position = "top") +
+  labs(title = "Southwest border apprehensions data suggest that migration is seasonal",
+       subtitle = "Traditionally, spikes in apprehension happen in spring and summer", 
+       caption = "Source: CBP Apprehensions Data") +
+  xlab('Year')
+
+save <- plot + wola_theme
+save
+ggsave("Graphs/Intent_Heatmap.jpeg", width = 8, height = 6)
