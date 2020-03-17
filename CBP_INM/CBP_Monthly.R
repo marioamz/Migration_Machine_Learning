@@ -2,9 +2,9 @@ library(here)
 library(ggplot2)
 library(gganimate)
 library(dplyr)
-library(magick)
 library(reshape2)
 library(tidyr)
+library(viridis)
 
 # WOLA theme and colors
 wola_blue <- '#00b5ef'
@@ -95,14 +95,14 @@ sqfin <- transform(fin, sqrt = sqrt(total))
 
 plot <- ggplot(touse, aes(month, reorder(year, desc(year)), fill=total)) +
   geom_tile(aes(fill = total)) + 
-  scale_color_manual(values = c('#22E9F5', wola_blue, '#0072D5', '#003ABA', '#000C9D', '#040080')) +
-  #scale_color_manual(values = c('#040080', '#000C9D', '#003ABA', '#0072D5', wola_blue, '#22E9F5')) +
+  scale_fill_distiller(palette = "RdYlBu") + 
   scale_x_discrete(position = "top") +
-  labs(title = "Southwest border apprehensions data suggest that migration is seasonal",
-       subtitle = "Traditionally, spikes in apprehension happen in spring and summer", 
-       caption = "Source: CBP Apprehensions Data") +
-  xlab('Year')
+  labs(title = "Monthly southwest border apprehensions data suggest \nmigration spikes occur in spring and summer",
+       subtitle = "Overall, migration rates decreased month over month between 2009-2018", 
+       caption = "Source: CBP Apprehensions Data",
+       fill = "Monthly \nApprehensions") 
 
 save <- plot + wola_theme
 save
-ggsave("Graphs/Intent_Heatmap.jpeg", width = 8, height = 6)
+
+ggsave("Graphs/Monthly_Heatmap.jpeg", width = 8, height = 6)
