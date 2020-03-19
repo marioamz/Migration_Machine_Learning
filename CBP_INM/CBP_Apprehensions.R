@@ -57,7 +57,6 @@ plot = ggplot(cbpfinal, aes(rank, group = Country,
                 height = total,
                 width = 0.9), alpha = 0.8, color = NA) +
   geom_text(aes(y = 0, label = paste(Country, " ")), vjust = 0.2, hjust = 1) +
-  geom_text(aes(y=total,label = total, hjust=0)) +
   coord_flip(clip = "off", expand = FALSE) +
   scale_y_continuous(labels = scales::comma) +
   scale_x_reverse() +
@@ -79,12 +78,15 @@ plot = ggplot(cbpfinal, aes(rank, group = Country,
         plot.margin = margin(2,2, 2, 4, "cm"))
 
 # Animate by year
-anim = plot + transition_states(Year, transition_length = 10, state_length = 60) +
-  view_follow(fixed_x = TRUE)  +
-  labs(title = 'Central American migration has increased \n exponentially in the last decade',
-       subtitle  =  "CBP apprehensions by country: {closest_state}",
+anim = plot + transition_states(Year) +
+  labs(title = 'Central American migration has increased exponentially in the last decade, \nwhile Mexican migration has decreasd',
+       subtitle  =  "Top 10 countries of origin for CBP apprehensions: {closest_state}",
        caption  = "Source: Customs and Border Protection Data (2007-2019)")
 
+final_animation<-animate(anim,50,fps = 15,duration = 15, width = 800, height = 600, renderer = gifski_renderer())
+
+final_animation
+
 # Save
-anim_save('Graphs/CBP_Apps.gif', anim)
+anim_save('Graphs/CBP_Apps.gif', final_animation)
 
