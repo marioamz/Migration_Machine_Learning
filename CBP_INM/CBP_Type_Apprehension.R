@@ -194,14 +194,16 @@ plot <- ggplot(melted, aes(date, value, group=variable)) +
   geom_point(size = 2) + 
   geom_text_repel(aes(x = as.Date("2020-03-15", "%Y-%m-%d"), label = variable), hjust = -2) + 
   transition_reveal(date) + 
+  view_follow() +
   coord_cartesian(clip = 'off') + 
-  labs(title = 'Region-wide, people self-eport paying bribes \n to police or public officials less frequently',
-       subtitle = 'Decreases are evident in Honduras and Guatemala, \n reporting in El Salvador has remained constant',
-       caption = "Source: EXC2 and EXC6 in LAPOP surveys, \n asking if police or public officials have asked the survey taker for a bribe in the last 12 months") + 
-  xlab('Year') + ylab('Percent responding "Yes"') 
+  labs(title = 'Between 2018 and 2019, CBP apprehended more family units than ever before',
+       subtitle = 'Historically, single adults have been the majority of apprehensions',
+       caption = "Source: CBP Southwest Border Apprehension Data") 
 
 animation <- plot + wola_theme + theme(legend.position = 'none')
 
-animation
+final_animation<-animate(animation,50,fps = 10,duration = 10, width = 800, height = 600, renderer = gifski_renderer())
 
-ggsave("Graphs/Monthly_Heatmap.jpeg", width = 8, height = 6)
+final_animation 
+
+anim_save('Graphs/Type_Apprehension.gif', final_animation)
