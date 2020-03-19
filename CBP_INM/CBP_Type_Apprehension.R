@@ -4,8 +4,8 @@ library(gganimate)
 library(dplyr)
 library(reshape2)
 library(tidyr)
-library(viridis)
 library(zoo)
+library(ggrepel)
 
 # WOLA theme and colors
 wola_blue <- '#00b5ef'
@@ -106,7 +106,7 @@ totaluac <- uacfin %>%
 uacx <- melt(totaluac, id.vars = 'filter')
 
 finaluac <- cbind(uacy, uacx)
-colnames(finaluac) <- c('filter', 'variable', 'month', 'border', 'value', 'uac')
+colnames(finaluac) <- c('filter', 'variable', 'month', 'border', 'value', 'UAC')
 
 
 famsector <- famfin %>%
@@ -118,11 +118,11 @@ famtotal <- famfin %>%
 famx <- melt(famtotal, id.vars = 'filter')
 
 finalfam <- cbind(famy, famx)
-colnames(finalfam) <- c('filter', 'variable', 'month', 'border', 'value', 'fam')
+colnames(finalfam) <- c('filter', 'variable', 'month', 'border', 'value', 'Family')
 
 # Finally
 finaluac <- finaluac %>%
-  select(month, uac) %>%
+  select(month, UAC) %>%
   filter(month != "Yearly")
 
 finuac <- finaluac %>% 
@@ -134,7 +134,7 @@ finuac <- finuac[0:84,]
 
 # Finally
 finalfam <- finalfam %>%
-  select(month, fam) %>%
+  select(month, Family) %>%
   filter(month != "Yearly")
 
 finfam <- finalfam %>% 
@@ -166,12 +166,12 @@ finuac <- rbind(finuac, `86` = c('February', 2020, 3076))
 # join 
 inner <- merge(finfam, finuac, by = c('month', 'year'))
 touse <- merge(inner, fin, by = c('month', 'year'))
-touse$uac <- as.numeric(gsub(",","",touse$uac))
-touse$fam <- as.numeric(gsub(",","",touse$fam))
+touse$UAC <- as.numeric(gsub(",","",touse$UAC))
+touse$Family <- as.numeric(gsub(",","",touse$Family))
 
 # Now to get the number of single adults from the difference between the two
 touse <- touse %>%
-  mutate(adults = total - (fam + uac))
+  mutate(Adults = total - (Family + UAC))
 
 melted <- melt(touse)
 melted$date <- as.yearmon(paste(melted$year, melted$month), "%Y %b")
@@ -179,21 +179,29 @@ melted <- melted %>%
   filter(variable != 'total')
 melted <- transform(melted, date = as.Date(date, frac = 1))
 
+melted <- melted %>%
+  mutate(rank = rank(date)) %>%
+  arrange(date)
 
-lapply(melted, class)
+
 # FINALLY A PLOT
 
-plot <- ggplot(melted, aes(date, value, fill=variable, label = variable)) +
-  geom_line(aes(color = variable), size = 1) + scale_color_manual(values = c(wola_blue, wola_purple, wola_green)) + 
-  geom_point() + geom_text() + transition_reveal(date) + 
-  labs(title = 'Region-wide, people self-report paying bribes \n to police or public officials less frequently',
+plot <- ggplot(melted, aes(date, value, group=variable)) +
+  geom_line(aes(color = variable), size = 1) + 
+  geom_path() +
+  geom_segment(aes(xend = as.Date("2020-03-15", "%Y-%m-%d"), yend = value), linetype = 2, colour = wola_grey) +
+  scale_color_manual(values = c(wola_blue, wola_purple, wola_green)) + 
+  geom_point(size = 2) + 
+  geom_text_repel(aes(x = as.Date("2020-03-15", "%Y-%m-%d"), label = variable), hjust = -2) + 
+  transition_reveal(date) + 
+  coord_cartesian(clip = 'off') + 
+  labs(title = 'Region-wide, people self-eport paying bribes \n to police or public officials less frequently',
        subtitle = 'Decreases are evident in Honduras and Guatemala, \n reporting in El Salvador has remained constant',
        caption = "Source: EXC2 and EXC6 in LAPOP surveys, \n asking if police or public officials have asked the survey taker for a bribe in the last 12 months") + 
   xlab('Year') + ylab('Percent responding "Yes"') 
 
-animation <- plot + wola_theme + theme(legend.position = "none")
+animation <- plot + wola_theme + theme(legend.position = 'none')
 
 animation
-  
 
 ggsave("Graphs/Monthly_Heatmap.jpeg", width = 8, height = 6)
