@@ -97,8 +97,8 @@ plot <- ggplot(touse, aes(month, reorder(year, desc(year)), fill=total)) +
   geom_tile(aes(fill = total)) + 
   scale_fill_distiller(palette = "RdYlBu") + 
   scale_x_discrete(position = "top") +
-  labs(title = "Monthly southwest border apprehensions data suggest \nmigration spikes occur in spring and summer",
-       subtitle = "Overall, migration rates decreased month over month between 2009-2018", 
+  labs(title = "Monthly southwest border apprehensions data suggest \nmigration tends to increase in warmer weather",
+       subtitle = "Historically, March, April, and May have been peak migration months", 
        caption = "Source: CBP Apprehensions Data",
        fill = "Monthly \nApprehensions") 
 
