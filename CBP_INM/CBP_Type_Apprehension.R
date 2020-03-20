@@ -183,16 +183,15 @@ melted <- melted %>%
   mutate(rank = rank(date)) %>%
   arrange(date)
 
-
 # FINALLY A PLOT
 
 plot <- ggplot(melted, aes(date, value, group=variable)) +
   geom_line(aes(color = variable), size = 1) + 
   geom_path() +
-  geom_segment(aes(xend = as.Date("2020-03-15", "%Y-%m-%d"), yend = value), linetype = 2, colour = wola_grey) +
+  geom_segment(aes(xend = as.Date("2020-04-15", "%Y-%m-%d"), yend = value), linetype = 2, colour = wola_grey) +
   scale_color_manual(values = c(wola_blue, wola_purple, wola_green)) + 
   geom_point(size = 2) + 
-  geom_text_repel(aes(x = as.Date("2020-03-15", "%Y-%m-%d"), label = variable), hjust = -2) + 
+  geom_text_repel(aes(x = as.Date("2020-04-15", "%Y-%m-%d"), label = variable), hjust = -2.5) + 
   transition_reveal(date) + 
   view_follow() +
   coord_cartesian(clip = 'off') + 
@@ -202,7 +201,7 @@ plot <- ggplot(melted, aes(date, value, group=variable)) +
 
 animation <- plot + wola_theme + theme(legend.position = 'none')
 
-final_animation<-animate(animation,50,fps = 10,duration = 10, width = 800, height = 600, renderer = gifski_renderer())
+final_animation<-animate(animation,50,fps = 10,duration = 22.5, width = 800, height = 600, renderer = gifski_renderer(), end_pause = 100)
 
 final_animation 
 
