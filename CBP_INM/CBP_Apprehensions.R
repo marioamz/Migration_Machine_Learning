@@ -2,7 +2,7 @@ library(here)
 library(ggplot2)
 library(gganimate)
 library(dplyr)
-library(magick)
+library(tidyr)
 
 # Read in data, fix NAs, get rid of total rows
 cbp <- read.csv(here("CBP_INM/Data/CBP_data.csv"), check.names = FALSE)
