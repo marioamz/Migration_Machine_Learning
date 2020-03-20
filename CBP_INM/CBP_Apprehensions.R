@@ -79,7 +79,7 @@ plot = ggplot(cbpfinal, aes(rank, group = Country,
 
 # Animate by year
 anim = plot + transition_states(Year) +
-  labs(title = 'Central American migration has increased exponentially in the last decade, \nwhile Mexican migration has decreasd',
+  labs(title = 'Central American migration has increased significantly in the last decade, \nwhile Mexican migration has decreased',
        subtitle  =  "Top 10 countries of origin for CBP apprehensions: {closest_state}",
        caption  = "Source: Customs and Border Protection Data (2007-2019)")
 
