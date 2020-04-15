@@ -34,7 +34,52 @@ final <- viol %>%
   select(Entidad, Municipio, `Cve. Municipio`,`Bien jurídico afectado`, `Subtipo de delito`, total_sum, total_sex, hombres, mujeres, total) %>%
   mutate(tot_sex = sum(total_sex)) %>%
   ungroup() %>%
-  select(Entidad, Municipio, `Cve. Municipio`, `Subtipo de delito`, total_sum, tot_sex, hombres, mujeres, total)
+  select(Entidad, Municipio, `Cve. Municipio`, `Subtipo de delito`, total_sum, tot_sex, hombres, mujeres, total) %>%
+  filter(Entidad == 'Baja California' | Entidad == 'Sonora' | Entidad == 'Coahuila' | Entidad == 'Nuevo León' |
+           Entidad == 'Tamaulipas' | Entidad == 'Chihuahua') %>%
+  filter(Municipio == 'Tecate' |
+           Municipio == 'Tijuana' |
+           Municipio == 'Mexicali' |
+           Municipio == 'San Luis Río Colorado' |
+           Municipio == 'Sáric' |
+           Municipio == 'General Plutarco Elías Calles' |
+           Municipio == 'Nogales' |
+           Municipio == 'Naco' |
+           Municipio == 'Agua Prieta' |
+           Municipio == 'Ascensión' |
+           Municipio == 'Praxedis G. Guerrero' |
+           Municipio == 'Juárez' |
+           Municipio == 'Ojinaga' |
+           Municipio == 'Ciudad Acuña' |
+           Municipio == 'Piedras Negras' |
+           Municipio == 'Anáhuac' |
+           Municipio == 'Nuevo Laredo' |
+           Municipio == 'Reynosa' |
+           Municipio == 'Río Bravo' |
+           Municipio == 'Matamoros' |
+           Municipio == 'Miguel Alemán' |
+           Municipio == 'Gustavo Díaz Ordaz') %>%
+  filter(`Cve. Municipio` != 8044 & `Cve. Municipio` != 19031) 
+
+final_hom <- final %>%
+  filter(`Subtipo de delito` == 'Homicidio doloso') %>%
+  summarise_at(c('total', 'total_sum'), sum) %>%
+  mutate(pc_hom = (total_sum / total) * 100000)
+
+final_kid <- final %>%
+  filter(`Subtipo de delito` == 'Secuestro') %>%
+  summarise_at(c('total', 'total_sum'), sum) %>%
+  mutate(pc_hom = (total_sum / total) * 100000)
+
+final_sex <- final %>%
+  filter(`Subtipo de delito` == 'Acoso sexual') %>%
+  summarise_at(c('mujeres', 'tot_sex'), sum) %>%
+  mutate(pc_fem = (tot_sex / mujeres) * 100000)
+
+final_fem <- final %>%
+  filter(`Subtipo de delito` == 'Feminicidio') %>%
+  summarise_at(c('mujeres', 'total_sum'), sum) %>%
+  mutate(pc_fem = (total_sum / mujeres) * 100000)
 
 
 
