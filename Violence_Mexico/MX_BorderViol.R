@@ -61,31 +61,20 @@ final <- viol %>%
   
 # Filter out border cities
 final_border <- final %>%
-  filter(Entidad == 'Baja California' | Entidad == 'Sonora' | Entidad == 'Coahuila' | Entidad == 'Nuevo León' |
+  filter(Entidad == 'Baja California' | Entidad == 'Sonora' | Entidad == 'Coahuila de Zaragoza' | Entidad == 'Nuevo León' |
            Entidad == 'Tamaulipas' | Entidad == 'Chihuahua') %>%
-  filter(Municipio == 'Tecate' |
-           Municipio == 'Tijuana' |
+  filter(Municipio == 'Tijuana' |
            Municipio == 'Mexicali' |
            Municipio == 'San Luis Río Colorado' |
-           Municipio == 'Sáric' |
-           Municipio == 'General Plutarco Elías Calles' |
            Municipio == 'Nogales' |
-           Municipio == 'Naco' |
            Municipio == 'Agua Prieta' |
-           Municipio == 'Ascensión' |
-           Municipio == 'Praxedis G. Guerrero' |
            Municipio == 'Juárez' |
-           Municipio == 'Ojinaga' |
-           Municipio == 'Ciudad Acuña' |
+           Municipio == 'Acuña' |
            Municipio == 'Piedras Negras' |
-           Municipio == 'Anáhuac' |
            Municipio == 'Nuevo Laredo' |
            Municipio == 'Reynosa' |
-           Municipio == 'Río Bravo' |
-           Municipio == 'Matamoros' |
-           Municipio == 'Miguel Alemán' |
-           Municipio == 'Gustavo Díaz Ordaz') %>%
-  filter(`Cve. Municipio` != 8044 & `Cve. Municipio` != 19031) 
+           Municipio == 'Matamoros') %>%
+  filter(`Cve. Municipio` != 8044 & `Cve. Municipio` != 19031 & `Cve. Municipio` != 5017 & `Cve. Municipio` != 5015) 
 
 # Calculate per capita rates for the country for the four crimes
 total_hom <- final %>%
@@ -109,34 +98,42 @@ total_sex <- final %>%
   mutate(tot_pc = (tot / total_muj) * 100000)
 
 
-# Calculate per capita rates for border cities for the four crimes, add row with national rate
+# Calculate per capita rates for border cities for the four crimes
 border_hom <- final_border %>%
   filter(`Subtipo de delito` == 'Homicidio doloso') %>%
   mutate(`Homicides per 100,000` = (total_sum / total) * 100000) %>%
-  select(Municipio, `Subtipo de delito`, `Homicides per 100,000`, total, total_sum) %>%
+  select(Entidad, Municipio, `Subtipo de delito`, `Homicides per 100,000`, total, total_sum) %>%
+  unite(mun, Municipio, Entidad, sep = ', ') %>%
   arrange(`Homicides per 100,000`) %>%
-  mutate(muni = factor(Municipio, levels = Municipio))
+  mutate(muni = factor(mun, levels = mun))
+
+# Dividing by category of programs
+type <- c("San Luis Río Colorado, Sonora", "Agua Prieta, Sonora", "Acuña, Coahuila de Zaragoza")
+border_hom$category <- ifelse(border_hom$mun %in% type, "Metering", "MPP + Metering")
 
 border_sec <- final_border %>%
   filter(`Subtipo de delito` == 'Secuestro') %>%
   mutate(pc = (total_sum / total) * 100000) %>%
-  select(Municipio, `Subtipo de delito`, pc, total, total_sum) %>%
+  select(Entidad, Municipio, `Subtipo de delito`, pc, total, total_sum) %>%
   arrange(pc) %>%
   mutate(muni = factor(Municipio, levels = Municipio)) 
 
 border_fem <- final_border %>%
   filter(`Subtipo de delito` == 'Feminicidio') %>%
   mutate(pc = (total_sum / mujeres) * 100000) %>%
-  select(Municipio, `Subtipo de delito`, pc, mujeres, total_sum) %>%
+  select(Entidad, Municipio, `Subtipo de delito`, pc, mujeres, total_sum) %>%
   arrange(pc) %>%
   mutate(muni = factor(Municipio, levels = Municipio))
 
 border_sex <- final_border %>%
   filter(`Subtipo de delito` == 'Acoso sexual') %>%
   mutate(`Sex Crimes per 100,000` = (tot_sex / mujeres) * 100000) %>%
-  select(Municipio, `Subtipo de delito`, `Sex Crimes per 100,000`, mujeres, tot_sex) %>%
+  select(Entidad, Municipio, `Subtipo de delito`, `Sex Crimes per 100,000`, mujeres, tot_sex) %>%
+  unite(mun, Municipio, Entidad, sep = ', ') %>%
   arrange(`Sex Crimes per 100,000`) %>%
-  mutate(muni = factor(Municipio, levels = Municipio)) 
+  mutate(muni = factor(mun, levels = mun)) 
+
+border_sex$category <- ifelse(border_sex$mun %in% type, "Metering", "MPP + Metering")
 
 # Calculate per capita for border cities
 final_hom <- border_hom %>%
@@ -156,14 +153,13 @@ final_fem <- border_fem %>%
   mutate(pc_fem = (total_sum / mujeres) * 100000)
 
 # Diverted lollipop for homicides
-hom_plot <- ggplot(border_hom, aes(x=muni, y=`Homicides per 100,000`)) + 
-  geom_point(stat='identity', colour=wola_blue, size=2)  +
+hom_plot <- ggplot(border_hom, aes(x=muni, y=`Homicides per 100,000`, color = category)) + 
+  geom_point(stat='identity', size=2)  +
   geom_segment(aes(y = total_hom$tot_pc, 
                    x = muni, 
                    yend = `Homicides per 100,000`, 
-                   xend = muni), 
-               color = wola_blue) +
-  gghighlight(total > 250000, use_direct_label = FALSE) +
+                   xend = muni)) +
+  scale_colour_manual(values = c(wola_grey, wola_blue)) +
   labs(title="Cities where large numbers of migrants are stranded, such as \nTijuana, Juárez, and Reynosa have homicide per capita rates \nthat far exceed the national rate", 
        subtitle="On the whole, border cities tend to have larger homicide per capita rates than \nthe national rate",
        caption='Sources: SESNSP municipal homicide data and CONAPO 2015 Census data') +
@@ -172,18 +168,17 @@ hom_plot <- ggplot(border_hom, aes(x=muni, y=`Homicides per 100,000`)) +
   coord_flip()
 
 hom <- hom_plot + wola_theme 
-
+hom
 ggsave("Graphs/MX_Homicides.jpeg", width = 10, height = 6)
 
 # Diverted lollipop for sexual crimes
-sex_plot <- ggplot(border_sex, aes(x=muni, y=`Sex Crimes per 100,000`)) + 
-  geom_point(stat='identity', colour=wola_blue, size=2)  +
+sex_plot <- ggplot(border_sex, aes(x=muni, y=`Sex Crimes per 100,000`, color = category)) + 
+  geom_point(stat='identity', size=2)  +
   geom_segment(aes(y = total_sex$tot_pc, 
                    x = muni, 
                    yend = `Sex Crimes per 100,000`, 
-                   xend = muni), 
-               color = wola_blue) +
-  gghighlight(mujeres > 199000, use_direct_label = FALSE) +
+                   xend = muni)) +
+  scale_colour_manual(values = c(wola_grey, wola_blue)) +
   labs(title="Border municipalities where large numbers of migrants are stranded \nreport more sex crimes per capita than the national rate", 
        subtitle="Of these, only Nuevo Laredo reports a slightly lower rate than national",
        caption='Sources: SESNSP municipal sex crime data and CONAPO 2015 Census data') +
@@ -192,7 +187,7 @@ sex_plot <- ggplot(border_sex, aes(x=muni, y=`Sex Crimes per 100,000`)) +
   coord_flip()
 
 sex <- sex_plot + wola_theme 
-
+sex
 ggsave("Graphs/MX_SexCrimes.jpeg", width = 10, height = 6)
 
 
